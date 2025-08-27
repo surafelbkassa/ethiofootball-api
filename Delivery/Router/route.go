@@ -1,18 +1,19 @@
 package router
 
 import (
-	"net/http"
+	"os"
 
+	"github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
+	"github.com/abrshodin/ethio-fb-backend/Infrastructure"
+	"github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter() *gin.Engine {
-	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+func RegisterRoute(router *gin.Engine) {
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	intentParser := infrastructure.NewAIIntentParser(apiKey)
+	intentUsecase := usecase.NewParseIntentUsecase(intentParser)
+	intentController := controller.NewIntentController(intentUsecase)
 
-	return router
+	router.POST("/intent/parse", intentController.ParseIntent)
 }

@@ -2,10 +2,13 @@ package main
 
 import (
 	"github.com/abrshodin/ethio-fb-backend/Delivery/Router"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	router := router.NewRouter()
+	r := gin.Default()
+	router.RegisterRoute(r)
 
-	router.Run()
+	r.Run()
 }
