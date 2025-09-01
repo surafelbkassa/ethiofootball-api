@@ -9,6 +9,7 @@ import (
 )
 
 func RedisConnect() *redis.Client {
+	
 	ctx := context.Background()
 	redisAddress  := os.Getenv("REDIS_ADDRESS")
 	redisUsername := os.Getenv("REDIS_USERNAME")
