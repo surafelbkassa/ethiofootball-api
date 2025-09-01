@@ -1,8 +1,9 @@
-package router
+package routers
 
 import (
 	"net/http"
-
+  
+	controlller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -31,4 +32,13 @@ func NewRouter(fixtureUC usecase.FixtureUsecase) *gin.Engine {
 	})
 
 	return router
+}
+
+func RegisterTeamRoutes(r *gin.Engine, handler *controlller.TeamController){
+
+	team := r.Group("team")
+	{
+		team.GET("/:id/bio", handler.GetTeam)
+		team.POST("/create", handler.AddTeam)
+	}
 }

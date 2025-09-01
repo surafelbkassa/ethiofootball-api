@@ -1,12 +1,35 @@
 package usecase
 
 import (
+  "context"
 	"errors"
 
 	domain "github.com/abrshodin/ethio-fb-backend/Domain"
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
 )
+// team usecase
+type TeamUsecases interface {
+	GetTeam(ctx context.Context, teamId string) (*domain.Team, error)
+	AddTeam(ctx context.Context, team *domain.Team) error
+}
 
+func NewTeamUsecase(repo domain.TeamRepo) TeamUsecases{
+	return &teamUsecase{teamRepo: repo}
+}
+
+type teamUsecase struct{
+	teamRepo domain.TeamRepo
+}
+
+func(tu *teamUsecase) GetTeam(ctx context.Context, teamId string)(*domain.Team, error){
+	return tu.teamRepo.Get(ctx, teamId)
+} 
+
+func(tu *teamUsecase) AddTeam(ctx context.Context, team *domain.Team) error{
+	return tu.teamRepo.Add(ctx, team)
+}
+
+// fixture
 type FixtureUsecase interface {
 	GetFixtures(league, team, from, to string) ([]domain.Fixture, error)
 }
@@ -27,3 +50,4 @@ func (uc *fixtureUsecase) GetFixtures(league, team, from, to string) ([]domain.F
 
 	return uc.repo.GetFixtures(league, team, from, to)
 }
+
