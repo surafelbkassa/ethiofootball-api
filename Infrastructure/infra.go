@@ -1,13 +1,36 @@
-package infrastructure
+package infrastrucutre
 
 import (
+	"context"
 	"fmt"
+	"os"
+
+	"github.com/redis/go-redis/v9"
 )
 
-// RedisConnect is just a placeholder right now
-// later: configure actual Redis client
-func RedisConnect() string {
-	return "redis-client-stub"
+func RedisConnect() *redis.Client {
+	
+	ctx := context.Background()
+	redisAddress  := os.Getenv("REDIS_ADDRESS")
+	redisUsername := os.Getenv("REDIS_USERNAME")
+	redisPassword := os.Getenv("REDIS_PASSWORD")
+	
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     redisAddress,
+		Username: redisUsername,
+		Password: redisPassword,
+		DB:       0,
+	})
+
+	rdb.Set(ctx, "foo", "bar", 0)
+	result, err := rdb.Get(ctx, "foo").Result()
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(result) 
+	return rdb
 }
 
 // Example external API call placeholder
@@ -27,3 +50,4 @@ func FetchFixturesFromAPI(league, team, from, to string) []map[string]string {
 		},
 	}
 }
+
