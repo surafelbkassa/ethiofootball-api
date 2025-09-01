@@ -4,6 +4,7 @@ import (
 	"context"
 
 	domain "github.com/abrshodin/ethio-fb-backend/Domain"
+	infrastrucutre "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -70,7 +71,7 @@ type FixtureRepo interface {
 type APIRepo struct{}
 
 func (r *APIRepo) GetFixtures(league, team, from, to string) ([]domain.Fixture, error) {
-	raw := infrastructure.FetchFixturesFromAPI(league, team, from, to)
+	raw := infrastrucutre.FetchFixturesFromAPI(league, team, from, to)
 
 	var fixtures []domain.Fixture
 	for _, item := range raw {
