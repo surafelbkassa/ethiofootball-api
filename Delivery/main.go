@@ -1,11 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
+	controlller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
 	"github.com/abrshodin/ethio-fb-backend/Delivery/Router"
 	infrastrucutre "github.com/abrshodin/ethio-fb-backend/Infrastructure"
+	repository "github.com/abrshodin/ethio-fb-backend/Repository"
+	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/joho/godotenv"
 )
 
@@ -15,8 +17,14 @@ func main() {
 	if err != nil {
 		log.Fatal("error in loading .env file")
 	}
+
 	redisClient := infrastrucutre.RedisConnect()
-	fmt.Print(redisClient)
-	router := router.NewRouter()
+	teamRepo := repository.NewTeamRepo(redisClient)
+	teamUsecase := usecase.NewTeamUsecase(teamRepo)
+	teamHandler := controlller.NewTeamController(teamUsecase)
+
+	router := routers.NewRouter()
+	routers.RegisterTeamRoutes(router, teamHandler)
+
 	router.Run()
 }
