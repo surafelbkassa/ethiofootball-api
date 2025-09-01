@@ -4,7 +4,7 @@ import (
 	"log"
 
 	controlller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
-	"github.com/abrshodin/ethio-fb-backend/Delivery/Router"
+	router "github.com/abrshodin/ethio-fb-backend/Delivery/Router"
 	infrastrucutre "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
@@ -23,7 +23,10 @@ func main() {
 	teamUsecase := usecase.NewTeamUsecase(teamRepo)
 	teamHandler := controlller.NewTeamController(teamUsecase)
 
-	router := routers.NewRouter()
+	fixtureRepo := &repository.APIRepo{}
+	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo)
+
+	router := router.NewRouter(fixtureUC)
 	routers.RegisterTeamRoutes(router, teamHandler)
 
 	router.Run()
