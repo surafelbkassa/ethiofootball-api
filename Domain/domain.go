@@ -56,3 +56,21 @@ type CacheMeta struct {
 	Source      string `json:"source"`
 	FreshnessTS string `json:"freshness_ts"`
 }
+
+// Event represents a football match event
+type Event struct {
+    IDEvent         string `json:"idEvent"`
+    StrEvent        string `json:"strEvent"`
+    StrEventAlternate string `json:"strEventAlternate"`
+    StrLeague       string `json:"strLeague"`
+    StrSeason       string `json:"strSeason"`
+    StrHomeTeam     string `json:"strHomeTeam"`
+    StrAwayTeam     string `json:"strAwayTeam"`
+    IntHomeScore    string `json:"intHomeScore"`
+    IntAwayScore    string `json:"intAwayScore"`
+    DateEvent       string `json:"dateEvent"`
+    StrTime         string `json:"strTime"`
+    StrStatus       string `json:"strStatus"`
+    StrHomeTeamBadge string `json:"strHomeTeamBadge"`
+    StrAwayTeamBadge string `json:"strAwayTeamBadge"`
+}

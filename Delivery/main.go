@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	controlller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
+	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
 	routers "github.com/abrshodin/ethio-fb-backend/Delivery/Router"
-	infrastrucutre "github.com/abrshodin/ethio-fb-backend/Infrastructure"
+	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/joho/godotenv"
@@ -13,20 +13,27 @@ import (
 
 func main() {
 
-	err := godotenv.Load()
+	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal("error in loading .env file")
 	}
 
-	redisClient := infrastrucutre.RedisConnect()
+	// Redis & Team setup
+	redisClient := infrastructure.RedisConnect()
 	teamRepo := repository.NewTeamRepo(redisClient)
 	teamUsecase := usecase.NewTeamUsecase(teamRepo)
-	teamHandler := controlller.NewTeamController(teamUsecase)
+	teamHandler := controller.NewTeamController(teamUsecase)
 
+	// Fixture setup
 	fixtureRepo := &repository.APIRepo{}
 	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo)
 
-	router := routers.NewRouter(fixtureUC)
+	// News setup
+	eventRepo := repository.NewEventRepository()
+	newsUC := usecase.NewNewsUseCase(eventRepo)
+
+	// Router
+	router := routers.NewRouter(fixtureUC, newsUC)
 	routers.RegisterTeamRoutes(router, teamHandler)
 
 	router.Run()
