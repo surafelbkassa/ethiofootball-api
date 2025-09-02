@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/abrshodin/ethio-fb-backend/Delivery/Router"
+	router "github.com/abrshodin/ethio-fb-backend/Delivery/Router"
 	infrastrucutre "github.com/abrshodin/ethio-fb-backend/Infrastructure"
+	repository "github.com/abrshodin/ethio-fb-backend/Repository"
+	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/joho/godotenv"
 )
 
@@ -17,6 +19,11 @@ func main() {
 	}
 	redisClient := infrastrucutre.RedisConnect()
 	fmt.Print(redisClient)
-	router := router.NewRouter()
+
+	fixtureRepo := &repository.APIRepo{}
+
+	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo)
+
+	router := router.NewRouter(fixtureUC)
 	router.Run()
 }
