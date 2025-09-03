@@ -23,11 +23,15 @@ func main() {
 	teamUsecase := usecase.NewTeamUsecase(teamRepo)
 	teamHandler := controlller.NewTeamController(teamUsecase)
 
+	HistoryService := infrastrucutre.NewHistoryService()
+	historyHandler := controlller.NewHistoryController(HistoryService)
+
 	fixtureRepo := &repository.APIRepo{}
 	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo)
 
 	router := routers.NewRouter(fixtureUC)
 	routers.RegisterTeamRoutes(router, teamHandler)
+	routers.RegisterAPISercice(router, historyHandler)
 
 	router.Run()
 }

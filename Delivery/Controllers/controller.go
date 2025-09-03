@@ -48,3 +48,7 @@ func (tc *TeamController) AddTeam(c *gin.Context){
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "team added successfully"})
 }
 
+
+
+
+

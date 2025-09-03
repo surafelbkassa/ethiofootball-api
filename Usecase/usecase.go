@@ -13,12 +13,12 @@ type TeamUsecases interface {
 	AddTeam(ctx context.Context, team *domain.Team) error
 }
 
-func NewTeamUsecase(repo domain.TeamRepo) TeamUsecases{
+func NewTeamUsecase(repo domain.IRedisRepo) TeamUsecases{
 	return &teamUsecase{teamRepo: repo}
 }
 
 type teamUsecase struct{
-	teamRepo domain.TeamRepo
+	teamRepo domain.IRedisRepo
 }
 
 func(tu *teamUsecase) GetTeam(ctx context.Context, teamId string)(*domain.Team, error){
