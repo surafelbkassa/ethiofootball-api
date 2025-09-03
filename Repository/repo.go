@@ -8,7 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func NewTeamRepo (rdb *redis.Client) domain.TeamRepo {
+func NewTeamRepo (rdb *redis.Client) domain.IRedisRepo {
 	return &teamRepo{rdb: rdb}
 }
 type teamRepo struct {
