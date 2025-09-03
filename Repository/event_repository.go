@@ -70,7 +70,7 @@ func (r *EventRepositoryImpl) GetStandings() ([]domain.LeaguePoint, error) {
 }
 
 func (r *EventRepositoryImpl) GetFutureEvents() ([]domain.Event, error) {
-	resp, err := http.Get(r.apiURL)
+	resp, err := http.Get(r.apiFutureURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch events: %v", err)
 	}
