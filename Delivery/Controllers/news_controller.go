@@ -30,3 +30,35 @@ func (c *NewsController) GetNews(ctx *gin.Context) {
 		"news":   news,
 	})
 }
+
+func (c *NewsController) GetStandingNews(ctx *gin.Context) {
+	news, err := c.newsUC.GenerateStandingNews()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"news":   news,
+	})
+}
+
+func (c *NewsController) GetFutureNews(ctx *gin.Context) {
+	news, err := c.newsUC.GenerateFutureNews()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"news":   news,
+	})
+}
