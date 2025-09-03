@@ -35,8 +35,12 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 
 	// News route 
 	newsHandler := controlller.NewNewsController(newsUC)
-	router.GET("/news", newsHandler.GetNews)
+	newsRouter := router.Group("/news")
 
+	newsRouter.GET("/pastMatches", newsHandler.GetNews)
+	newsRouter.GET("/standings", newsHandler.GetStandingNews)
+	newsRouter.GET("/futureMatches", newsHandler.GetFutureNews)
+	
 	return router
 }
 

@@ -74,3 +74,25 @@ type Event struct {
     StrHomeTeamBadge string `json:"strHomeTeamBadge"`
     StrAwayTeamBadge string `json:"strAwayTeamBadge"`
 }
+
+type LeaguePoint struct {
+	IDStanding     string `json:"idStanding"`
+	IntRank        string `json:"intRank"`
+	IDTeam        string `json:"idTeam"`
+	StrTeam       string `json:"strTeam"`
+	StrBadge      string `json:"strBadge"`
+	IDLeague      string `json:"idLeague"`
+	StrLeague     string `json:"strLeague"`
+	StrSeason     string `json:"strSeason"`
+	StrForm       string `json:"strForm"`
+	StrDescription string `json:"strDescription"`
+	IntPlayed     string `json:"intPlayed"`
+	IntWin        string `json:"intWin"`
+	IntLoss      string `json:"intLoss"`
+	IntDraw      string `json:"intDraw"`
+	IntGoalsFor  string `json:"intGoalsFor"`
+	IntGoalsAgainst string `json:"intGoalsAgainst"`
+	IntGoalDifference string `json:"intGoalDifference"`
+	IntPoints    string `json:"intPoints"`
+	DateUpdated  string `json:"dateUpdated"`
+}
