@@ -24,8 +24,10 @@ func main() {
 	teamUsecase := usecase.NewTeamUsecase(teamRepo)
 	teamHandler := controller.NewTeamController(teamUsecase)
 
-	HistoryService := infrastructure.NewHistoryService()
-	historyHandler := controller.NewHistoryController(HistoryService)
+	apiService := infrastructure.NewAPIService()
+	prevRepo := repository.NewPrevFixturesRepo(redisClient)
+	prevUC := usecase.NewPrevFixturesUsecase(apiService, prevRepo)
+	historyHandler := controller.NewPrevFixturesController(prevUC)
 
 	fixtureRepo := &repository.APIRepo{}
 	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo)
