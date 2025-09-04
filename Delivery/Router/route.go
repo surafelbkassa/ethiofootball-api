@@ -33,14 +33,14 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 		c.JSON(http.StatusOK, gin.H{"fixtures": fixtures})
 	})
 
-	// News route 
+	// News route
 	newsHandler := controlller.NewNewsController(newsUC)
 	newsRouter := router.Group("/news")
 
 	newsRouter.GET("/pastMatches", newsHandler.GetNews)
 	newsRouter.GET("/standings", newsHandler.GetStandingNews)
 	newsRouter.GET("/futureMatches", newsHandler.GetFutureNews)
-	
+
 	return router
 }
 
@@ -52,7 +52,7 @@ func RegisterTeamRoutes(r *gin.Engine, handler *controlller.TeamController) {
 	}
 }
 
-func RegisterAPISercice(r *gin.Engine, handler *controlller.HistoryController){
+func RegisterAPISercice(r *gin.Engine, handler *controlller.PrevFixturesController) {
 
 	api := r.Group("api")
 	{
