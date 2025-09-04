@@ -9,18 +9,17 @@ import (
 	domain "github.com/abrshodin/ethio-fb-backend/Domain"
 )
 
-
-type IHistoryAPIService interface {
-	PreviousFixtures(leagueID int, season int, fromDate, toDate string)(*[]domain.PreviousFixtures, error)
+type IAPIService interface {
+	PrevFixtures(leagueID int, season int, fromDate, toDate string) (*[]domain.PrevFixtures, error)
 }
 
-func NewHistoryService () IHistoryAPIService  {
-	return &HistoryService{}
+func NewAPIService() IAPIService {
+	return &APIServiceClient{}
 }
 
-type HistoryService struct {}
+type APIServiceClient struct{}
 
-func (hs HistoryService) PreviousFixtures(leagueID int, season int, fromDate, toDate string) (*[]domain.PreviousFixtures, error) {
+func (hs APIServiceClient) PrevFixtures(leagueID int, season int, fromDate, toDate string) (*[]domain.PrevFixtures, error) {
 
 	url := fmt.Sprintf(
 		"https://v3.football.api-sports.io/fixtures?league=%d&season=%d&from=%s&to=%s",
@@ -52,27 +51,26 @@ func (hs HistoryService) PreviousFixtures(leagueID int, season int, fromDate, to
 		return nil, domain.ErrInternalServer
 	}
 
-
 	var apiResponse domain.APIResponse
 	if err := json.Unmarshal([]byte(string(body)), &apiResponse); err != nil {
 		return nil, domain.ErrInternalServer
 	}
 
-	var prevFixtures = &[]domain.PreviousFixtures{} 
+	var prevFixtures = &[]domain.PrevFixtures{}
 	for _, r := range apiResponse.Response {
-		fixture := domain.PreviousFixtures{
-			Date:      r.Fixture.Date,
-			Venue: r.Fixture.Venue.Name,
-			League: r.League.Name,
+		fixture := domain.PrevFixtures{
+			Date:        r.Fixture.Date,
+			Venue:       r.Fixture.Venue.Name,
+			League:      r.League.Name,
 			LeagueRound: r.League.Round,
 			HomeTeam: domain.MTeam{
-				Name:   r.Teams.Home.Name,
-				Logo:   r.Teams.Home.Logo,
+				Name: r.Teams.Home.Name,
+				Logo: r.Teams.Home.Logo,
 			},
 
 			AwayTeam: domain.MTeam{
-				Name:   r.Teams.Away.Name,
-				Logo:   r.Teams.Away.Logo,
+				Name: r.Teams.Away.Name,
+				Logo: r.Teams.Away.Logo,
 			},
 
 			Goals: domain.Goals{
@@ -93,6 +91,3 @@ func (hs HistoryService) PreviousFixtures(leagueID int, season int, fromDate, to
 
 	return prevFixtures, nil
 }
-
-
-

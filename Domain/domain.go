@@ -58,15 +58,15 @@ type CacheMeta struct {
 }
 
 type APIResponse struct {
-	Response   []Match       `json:"response"`
+	Response []Match `json:"response"`
 }
 
 type Match struct {
 	Fixture PFixture `json:"fixture"`
-	League  League `json:"league"`
-	Teams   Teams   `json:"teams"`
-	Goals   Goals   `json:"goals"`
-	Score   Score `json:"score"`
+	League  League   `json:"league"`
+	Teams   Teams    `json:"teams"`
+	Goals   Goals    `json:"goals"`
+	Score   Score    `json:"score"`
 }
 
 type PFixture struct {
@@ -84,9 +84,9 @@ type Venue struct {
 }
 
 type League struct {
-	Name      string `json:"name"`
-	Country   string `json:"country"`
-	Round     string `json:"round"`
+	Name    string `json:"name"`
+	Country string `json:"country"`
+	Round   string `json:"round"`
 }
 
 type Teams struct {
@@ -95,8 +95,8 @@ type Teams struct {
 }
 
 type MTeam struct {
-	Name   string  `json:"name"`
-	Logo   string  `json:"logo"`
+	Name string `json:"name"`
+	Logo string `json:"logo"`
 }
 
 type Goals struct {
@@ -111,54 +111,62 @@ type Score struct {
 	Penalty   Goals `json:"penalty"`
 }
 
-type PreviousFixtures struct {
-	FixtureID int `json:"fixture_id"`
-	Date string `json:"date"`
-	Venue string `json:"venue"`
-	League string `json:"league"`
+type PrevFixtures struct {
+	FixtureID   int    `json:"fixture_id"`
+	Date        string `json:"date"`
+	Venue       string `json:"venue"`
+	League      string `json:"league"`
 	LeagueRound string `json:"round"`
-	HomeTeam MTeam `json:"home_team"`
-	AwayTeam MTeam `json:"away_team"`
-	Goals Goals `json:"goals"`
-	Score Score `json:"score"`
+	HomeTeam    MTeam  `json:"home_team"`
+	AwayTeam    MTeam  `json:"away_team"`
+	Goals       Goals  `json:"goals"`
+	Score       Score  `json:"score"`
 }
-	
+
+type RoundQuery struct {
+	League string `json:"league"`
+	Season int    `json:"season"`
+	Round  string `json:"round"`
+	From   string `json:"from"`
+	To     string `json:"to"`
+}
+
 // Event represents a football match event
 type Event struct {
-    IDEvent         string `json:"idEvent"`
-    StrEvent        string `json:"strEvent"`
-    StrEventAlternate string `json:"strEventAlternate"`
-    StrLeague       string `json:"strLeague"`
-    StrSeason       string `json:"strSeason"`
-    StrHomeTeam     string `json:"strHomeTeam"`
-    StrAwayTeam     string `json:"strAwayTeam"`
-    IntHomeScore    string `json:"intHomeScore"`
-    IntAwayScore    string `json:"intAwayScore"`
-    DateEvent       string `json:"dateEvent"`
-    StrTime         string `json:"strTime"`
-    StrStatus       string `json:"strStatus"`
-    StrHomeTeamBadge string `json:"strHomeTeamBadge"`
-    StrAwayTeamBadge string `json:"strAwayTeamBadge"`
+	IDEvent           string `json:"idEvent"`
+	StrEvent          string `json:"strEvent"`
+	StrEventAlternate string `json:"strEventAlternate"`
+	StrLeague         string `json:"strLeague"`
+	StrSeason         string `json:"strSeason"`
+	StrHomeTeam       string `json:"strHomeTeam"`
+	StrAwayTeam       string `json:"strAwayTeam"`
+	IntHomeScore      string `json:"intHomeScore"`
+	IntAwayScore      string `json:"intAwayScore"`
+	DateEvent         string `json:"dateEvent"`
+	StrTime           string `json:"strTime"`
+	StrStatus         string `json:"strStatus"`
+	StrHomeTeamBadge  string `json:"strHomeTeamBadge"`
+	StrAwayTeamBadge  string `json:"strAwayTeamBadge"`
 }
 
 type LeaguePoint struct {
-	IDStanding     string `json:"idStanding"`
-	IntRank        string `json:"intRank"`
-	IDTeam        string `json:"idTeam"`
-	StrTeam       string `json:"strTeam"`
-	StrBadge      string `json:"strBadge"`
-	IDLeague      string `json:"idLeague"`
-	StrLeague     string `json:"strLeague"`
-	StrSeason     string `json:"strSeason"`
-	StrForm       string `json:"strForm"`
-	StrDescription string `json:"strDescription"`
-	IntPlayed     string `json:"intPlayed"`
-	IntWin        string `json:"intWin"`
-	IntLoss      string `json:"intLoss"`
-	IntDraw      string `json:"intDraw"`
-	IntGoalsFor  string `json:"intGoalsFor"`
-	IntGoalsAgainst string `json:"intGoalsAgainst"`
+	IDStanding        string `json:"idStanding"`
+	IntRank           string `json:"intRank"`
+	IDTeam            string `json:"idTeam"`
+	StrTeam           string `json:"strTeam"`
+	StrBadge          string `json:"strBadge"`
+	IDLeague          string `json:"idLeague"`
+	StrLeague         string `json:"strLeague"`
+	StrSeason         string `json:"strSeason"`
+	StrForm           string `json:"strForm"`
+	StrDescription    string `json:"strDescription"`
+	IntPlayed         string `json:"intPlayed"`
+	IntWin            string `json:"intWin"`
+	IntLoss           string `json:"intLoss"`
+	IntDraw           string `json:"intDraw"`
+	IntGoalsFor       string `json:"intGoalsFor"`
+	IntGoalsAgainst   string `json:"intGoalsAgainst"`
 	IntGoalDifference string `json:"intGoalDifference"`
-	IntPoints    string `json:"intPoints"`
-	DateUpdated  string `json:"dateUpdated"`
+	IntPoints         string `json:"intPoints"`
+	DateUpdated       string `json:"dateUpdated"`
 }
