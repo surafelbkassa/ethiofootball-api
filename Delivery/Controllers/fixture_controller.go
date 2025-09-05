@@ -4,20 +4,20 @@ import (
 	"net/http"
 	"strconv"
 
-	domain2 "github.com/abrshodin/ethio-fb-backend/Domain"
+	domain "github.com/abrshodin/ethio-fb-backend/Domain"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/gin-gonic/gin"
 )
 
-type PrevFixturesController struct {
-	prevUC usecase.IPrevFixturesUsecase
+type FixturesController struct {
+	FixureUC usecase.IFixturesUsecase
 }
 
-func NewPrevFixturesController(uc usecase.IPrevFixturesUsecase) *PrevFixturesController {
-	return &PrevFixturesController{prevUC: uc}
+func NewFixturesController(uc usecase.IFixturesUsecase) *FixturesController {
+	return &FixturesController{FixureUC: uc}
 }
 
-func (hc *PrevFixturesController) PreviousMatchHistory(c *gin.Context) {
+func (hc *FixturesController) PreviousMatchHistory(c *gin.Context) {
 
 	league := c.Query("league")
 	from := c.Query("from")
@@ -54,20 +54,20 @@ func (hc *PrevFixturesController) PreviousMatchHistory(c *gin.Context) {
 	}
 
 	season := getSeason(2023)
-	q := domain2.RoundQuery{League: league, Season: season, Round: round, From: from, To: to}
+	q := domain.RoundQuery{League: league, Season: season, Round: round, From: from, To: to}
 
-	rq, err := hc.prevUC.ResolveRoundWindow(c.Request.Context(), q)
+	rq, err := hc.FixureUC.ResolveRoundWindow(c.Request.Context(), q)
 	if err == nil {
 		q = rq
 	}
 
-	cached, err := hc.prevUC.GetCachedByRound(c.Request.Context(), q)
+	cached, err := hc.FixureUC.GetCachedByRound(c.Request.Context(), q)
 	if err == nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"result": cached, "source": "cache"})
 		return
 	}
 
-	result, err := hc.prevUC.FetchAndStore(c.Request.Context(), league, leagueID, q)
+	result, err := hc.FixureUC.FetchAndStore(c.Request.Context(), league, leagueID, q)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		c.Abort()
@@ -75,4 +75,27 @@ func (hc *PrevFixturesController) PreviousMatchHistory(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"result": result, "source": "api"})
+}
+
+func(fc *FixturesController) LiveFixtures (c *gin.Context){
+
+	league := c.Query("league")
+	if league != "EPL" && league != "ETH" {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "unsupported league queries"})
+		c.Abort()
+		return
+	}
+
+	result, err := fc.FixureUC.GetLiveMatches(league)
+	// if result == nil && err != nil {
+	// 	c.IndentedJSON(http.StatusOK, gin.H{"result": result})
+	// 	return
+	// }
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error" : err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"result": result})
 }
