@@ -10,22 +10,23 @@ import (
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
 )
 
-type IPrevFixturesUsecase interface {
+type IFixturesUsecase interface {
 	FetchAndStore(ctx context.Context, league string, leagueID int, q domain.RoundQuery) (*[]domain.PrevFixtures, error)
 	GetCachedByRound(ctx context.Context, q domain.RoundQuery) (*[]domain.PrevFixtures, error)
 	ResolveRoundWindow(ctx context.Context, q domain.RoundQuery) (domain.RoundQuery, error)
+	 GetLiveMatches (league string)(*[]domain.PrevFixtures, error)
 }
 
-func NewPrevFixturesUsecase(api infrastructure.IAPIService, repo repository.PrevFixturesRepo) IPrevFixturesUsecase {
-	return &prevFixturesUsecase{api: api, repo: repo}
+func NewFixturesUsecase(api infrastructure.IAPIService, repo repository.IFixturesRepo) IFixturesUsecase {
+	return &FixturesUsecase{api: api, repo: repo}
 }
 
-type prevFixturesUsecase struct {
+type FixturesUsecase struct {
 	api  infrastructure.IAPIService
-	repo repository.PrevFixturesRepo
+	repo repository.IFixturesRepo
 }
 
-func (uc *prevFixturesUsecase) FetchAndStore(ctx context.Context, league string, leagueID int, q domain.RoundQuery) (*[]domain.PrevFixtures, error) {
+func (uc *FixturesUsecase) FetchAndStore(ctx context.Context, league string, leagueID int, q domain.RoundQuery) (*[]domain.PrevFixtures, error) {
 
 	fixtures, err := uc.api.PrevFixtures(leagueID, q.Season, q.From, q.To)
 	if err != nil {
@@ -59,7 +60,7 @@ func (uc *prevFixturesUsecase) FetchAndStore(ctx context.Context, league string,
 	return fixtures, nil
 }
 
-func (uc *prevFixturesUsecase) GetCachedByRound(ctx context.Context, q domain.RoundQuery) (*[]domain.PrevFixtures, error) {
+func (uc *FixturesUsecase) GetCachedByRound(ctx context.Context, q domain.RoundQuery) (*[]domain.PrevFixtures, error) {
 	fixtures, err := uc.repo.GetFixturesByRound(ctx, q)
 	if err != nil {
 		return nil, err
@@ -82,7 +83,7 @@ func normalizeRound(s string) string {
 	return last
 }
 
-func (uc *prevFixturesUsecase) ResolveRoundWindow(ctx context.Context, q domain.RoundQuery) (domain.RoundQuery, error) {
+func (uc *FixturesUsecase) ResolveRoundWindow(ctx context.Context, q domain.RoundQuery) (domain.RoundQuery, error) {
 	if q.From != "" && q.To != "" {
 		return q, nil
 	}
@@ -115,4 +116,8 @@ func (uc *prevFixturesUsecase) ResolveRoundWindow(ctx context.Context, q domain.
 	}
 
 	return q, errors.New("round window not found")
+}
+
+func(uc *FixturesUsecase) GetLiveMatches (league string)(*[]domain.PrevFixtures, error){
+	return uc.api.LiveFixtures(league)
 }

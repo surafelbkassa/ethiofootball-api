@@ -26,8 +26,8 @@ func main() {
 
 	apiService := infrastructure.NewAPIService()
 	prevRepo := repository.NewPrevFixturesRepo(redisClient)
-	prevUC := usecase.NewPrevFixturesUsecase(apiService, prevRepo)
-	historyHandler := controller.NewPrevFixturesController(prevUC)
+	prevUC := usecase.NewFixturesUsecase(apiService, prevRepo)
+	historyHandler := controller.NewFixturesController(prevUC)
 
 	fixtureRepo := repository.NewAPIRepo(redisClient)
 	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo, fixtureRepo)

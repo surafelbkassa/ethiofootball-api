@@ -58,11 +58,12 @@ func RegisterTeamRoutes(r *gin.Engine, handler *controlller.TeamController) {
 	}
 }
 
-func RegisterAPISercice(r *gin.Engine, handler *controlller.PrevFixturesController) {
+func RegisterAPISercice(r *gin.Engine, handler *controlller.FixturesController) {
 
 	api := r.Group("api")
 	{
 		api.GET("/previous-fixtures", handler.PreviousMatchHistory)
+		api.GET("/live", handler.LiveFixtures)
 	}
 
 }
