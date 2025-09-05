@@ -2,58 +2,65 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"time"
 
 	domain "github.com/abrshodin/ethio-fb-backend/Domain"
-	infrastrucutre "github.com/abrshodin/ethio-fb-backend/Infrastructure"
+	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	"github.com/redis/go-redis/v9"
 )
 
-func NewTeamRepo (rdb *redis.Client) domain.IRedisRepo {
+// NewTeamRepo creates a new team repository
+func NewTeamRepo(rdb *redis.Client) domain.IRedisRepo {
 	return &teamRepo{rdb: rdb}
 }
+
 type teamRepo struct {
 	rdb *redis.Client
 }
 
-func(tr *teamRepo) Get(ctx context.Context, teamId string) (*domain.Team, error){
-
-	key := "team" + teamId
+func (tr *teamRepo) Get(ctx context.Context, teamId string) (*domain.Team, error) {
+	key := "team:" + teamId
 	vals, err := tr.rdb.HGetAll(ctx, key).Result()
 	if err != nil {
 		return nil, domain.ErrInternalServer
 	}
 
-	if vals == nil {
+	if len(vals) == 0 {
 		return nil, domain.ErrTeamNotFound
 	}
 
 	team := &domain.Team{
-		ID: vals["id"],
-		Name: vals["name"],
-		Short: vals["short"],
-		League: vals["league"],
+		ID:       vals["id"],
+		Name:     vals["name"],
+		Short:    vals["short"],
+		League:   vals["league"],
 		CrestURL: vals["crest_url"],
-		Bio: vals["bio"],
+		Bio:      vals["bio"],
 	}
 	return team, nil
 }
 
-func(tr *teamRepo) Add(ctx context.Context, team *domain.Team) error{
-
-	key := "team" + team.ID
+func (tr *teamRepo) Add(ctx context.Context, team *domain.Team) error {
+	key := "team:" + team.ID
 	exists, err := tr.rdb.Exists(ctx, key).Result()
+	if err != nil {
+		return domain.ErrInternalServer
+	}
 
 	if exists > 0 {
 		return domain.ErrDuplicateFound
 	}
+
 	err = tr.rdb.HSet(ctx, key, map[string]interface{}{
-		"ID": team.ID,
-		"name": team.Name,
-		"short": team.Short,
-		"league": team.League,
+		"id":        team.ID,
+		"name":      team.Name,
+		"short":     team.Short,
+		"league":    team.League,
 		"crest_url": team.CrestURL,
-		"bio": team.Bio,
-		}).Err()
+		"bio":       team.Bio,
+	}).Err()
 
 	if err != nil {
 		return domain.ErrInternalServer
@@ -62,28 +69,83 @@ func(tr *teamRepo) Add(ctx context.Context, team *domain.Team) error{
 	return nil
 }
 
-// FixtureRepo is an interface to abstract fixture data fetching
+// FixtureRepo abstracts fixture fetching
 type FixtureRepo interface {
 	GetFixtures(league, team, from, to string) ([]domain.Fixture, error)
 }
 
-// APIRepo implements FixtureRepo using Infrastructure
-type APIRepo struct{}
+// APIRepo fetches fixtures from API and caches in Redis
+type APIRepo struct {
+	RDB *redis.Client // exported for usecase
+}
+
+// NewAPIRepo returns a repo with optional Redis caching
+func NewAPIRepo(rdb *redis.Client) *APIRepo {
+	return &APIRepo{RDB: rdb}
+}
+
+func cacheKey(league, team, from, to string) string {
+	return fmt.Sprintf("fixtures:%s:%s:%s:%s", league, team, from, to)
+}
 
 func (r *APIRepo) GetFixtures(league, team, from, to string) ([]domain.Fixture, error) {
-	raw := infrastrucutre.FetchFixturesFromAPI(league, team, from, to)
+	ctx := context.Background()
+
+	// Try cache first
+	if r.RDB != nil {
+		if raw, err := r.RDB.Get(ctx, cacheKey(league, team, from, to)).Result(); err == nil {
+			var cached []domain.Fixture
+			if err := json.Unmarshal([]byte(raw), &cached); err == nil {
+				return cached, nil
+			}
+			// continue if unmarshal fails
+		}
+	}
+
+	// Fetch from API
+	raw, err := infrastructure.FetchFixturesFromAPI(league, team, from, to)
+	if err != nil {
+		fmt.Printf("FetchFixturesFromAPI failed: league=%s team=%s from=%s to=%s err=%v\n", league, team, from, to, err)
+		return nil, err
+	}
 
 	var fixtures []domain.Fixture
 	for _, item := range raw {
-		fixtures = append(fixtures, domain.Fixture{
-			ID:      item["id"],
-			League:  item["league"],
-			HomeID:  item["home_id"],
-			AwayID:  item["away_id"],
-			DateUTC: item["date"],
-			Status:  item["status"],
-			Score:   "0-0", // placeholder
-		})
+		fixture := domain.Fixture{
+			ID:          item["id"],
+			League:      item["league"],
+			DateUTC:     item["date"],
+			HomeID:      item["home_id"],
+			AwayID:      item["away_id"],
+			Status:      item["status"],
+			Score:       item["score"],
+			HomeLogo:    item["home_logo"],
+			AwayLogo:    item["away_logo"],
+			LastUpdated: item["last_update"],
+		}
+		fixtures = append(fixtures, fixture)
 	}
+
+	// Cache result for 5 minutes (best-effort)
+	if r.RDB != nil {
+		if b, err := json.Marshal(fixtures); err == nil {
+			_ = r.RDB.Set(ctx, cacheKey(league, team, from, to), b, 5*time.Minute).Err()
+		}
+	}
+
 	return fixtures, nil
+}
+
+// SetFixturesCache manually writes fixtures to cache (optional)
+func (r *APIRepo) SetFixturesCache(league, team, from, to string, fixtures []domain.Fixture) error {
+	if r.RDB == nil {
+		return nil
+	}
+
+	ctx := context.Background()
+	data, err := json.Marshal(fixtures)
+	if err != nil {
+		return err
+	}
+	return r.RDB.Set(ctx, cacheKey(league, team, from, to), data, 5*time.Minute).Err()
 }
