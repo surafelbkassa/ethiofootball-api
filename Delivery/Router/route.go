@@ -40,7 +40,7 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 	newsRouter.GET("/pastMatches", newsHandler.GetNews)
 	newsRouter.GET("/standings", newsHandler.GetStandingNews)
 	newsRouter.GET("/futureMatches", newsHandler.GetFutureNews)
-
+	newsRouter.GET("/liveScores", newsHandler.GetLiveScores)
 	return router
 }
 
