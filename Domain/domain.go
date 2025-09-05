@@ -8,18 +8,7 @@ type Team struct {
 	League   string    `json:"league"`
 	CrestURL string    `json:"crest_url"`
 	Bio      string    `json:"bio"`
-	Fixtures []Fixture // Add this line
-}
-
-// Standing represents league table information
-type Standing struct {
-	League      string `json:"league"`
-	Season      string `json:"season"`
-	Pos         int    `json:"pos"`
-	TeamID      string `json:"team_id"`
-	Points      int    `json:"pts"`
-	GoalDiff    int    `json:"gd"`
-	LastUpdated string `json:"last_updated"`
+	Fixtures []Fixture     
 }
 
 // Fixture represents a scheduled or completed match
@@ -66,11 +55,11 @@ type APIResponse struct {
 }
 
 type Match struct {
-	Fixture PFixture     `json:"fixture"`
-	League  League       `json:"league"`
-	Teams   Teams        `json:"teams"`
-	Goals   Goals        `json:"goals"`
-	Score   Score        `json:"score"`
+	Fixture PFixture `json:"fixture"`
+	League  League   `json:"league"`
+	Teams   Teams    `json:"teams"`
+	Goals   Goals    `json:"goals"`
+	Score   Score    `json:"score"`
 }
 
 type PFixture struct {
@@ -78,7 +67,7 @@ type PFixture struct {
 	Date      string `json:"date"`
 	Timestamp int64  `json:"timestamp"`
 	Venue     Venue  `json:"venue"`
-	Status  Status 		 `json:"status"`
+	Status    Status `json:"status"`
 }
 
 type Venue struct {
@@ -87,9 +76,14 @@ type Venue struct {
 }
 
 type League struct {
-	Name    string `json:"name"`
-	Country string `json:"country"`
-	Round   string `json:"round"`
+	ID   		int    				`json:"id"`
+	Name    	string 				`json:"name"`
+	Country 	string 				`json:"country"`
+	Round   	string 				`json:"round"`
+	Logo     	string      		`json:"logo"`
+	Flag     	string      		`json:"flag"`
+	Season   	int         		`json:"season"`
+	Standings 	[][] TeamStanding   `json:"standings"`
 }
 
 type Teams struct {
@@ -114,7 +108,6 @@ type Score struct {
 	Penalty   Goals `json:"penalty"`
 }
 
-
 type EventTeam struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
@@ -132,11 +125,10 @@ type EventAssist struct {
 }
 
 type Status struct {
-	Long 	string 	`json:"long"`
-	Short	string 	`json:"short"`
-	Elapsed int 	`json:"elapsed`
-	Extra   int 	`json:"extra"`
-
+	Long    string `json:"long"`
+	Short   string `json:"short"`
+	Elapsed int    `json:"elapsed"`
+	Extra   int    `json:"extra"`
 }
 
 type PrevFixtures struct {
@@ -149,7 +141,7 @@ type PrevFixtures struct {
 	AwayTeam    MTeam  `json:"away_team"`
 	Goals       Goals  `json:"goals"`
 	Score       Score  `json:"score"`
-	Status  	Status `json:"status"`
+	Status      Status `json:"status"`
 }
 
 type RoundQuery struct {
@@ -199,3 +191,64 @@ type LeaguePoint struct {
 	IntPoints         string `json:"intPoints"`
 	DateUpdated       string `json:"dateUpdated"`
 }
+type StandingAPIResponse struct {
+	Response []Response `json:"response"`
+}
+
+type Response struct{
+	League League `json:"league"`
+}
+
+type TeamStanding struct {
+    Rank          int          `json:"rank"`
+    Team          StandingTeam `json:"team"`
+    Points        int          `json:"points"`
+    GoalsDiff     int          `json:"goalsDiff"`
+    MatchesPlayed int          `json:"matchesPlayed"`
+    Wins          int          `json:"wins"`
+    Losses        int          `json:"losses"`
+    Draws         int          `json:"draws"`
+    All           MatchStats   `json:"all"`
+}
+
+type StandingTeam struct {
+    ID   int    `json:"id"`
+    Name string `json:"name"`
+    Logo string `json:"logo"`
+}
+
+type MatchStats struct {
+    Played int       `json:"played"`
+    Win    int       `json:"win"`
+    Draw   int       `json:"draw"`
+    Lose   int       `json:"lose"`
+    Goals  GoalStats `json:"goals"`
+}
+
+type GoalStats struct {
+    For     int `json:"for"`
+    Against int `json:"against"`
+}
+
+type Standing struct {
+    Rank          int    `json:"rank"`
+    TeamName      string `json:"teamName"`
+    TeamLogo      string `json:"teamLogo"`
+    Points        int    `json:"points"`
+    MatchesPlayed int    `json:"matchesPlayed"`
+    Wins          int    `json:"wins"`
+    Losses        int    `json:"losses"`
+    Draws         int    `json:"draws"`
+    GoalsDiff     int    `json:"goalsDiff"`
+}
+
+type StandingsResponse struct {
+    LeagueID    int        `json:"leagueId"`
+    LeagueName  string     `json:"leagueName"`
+    Country     string     `json:"country"`
+    CountryFlag string     `json:"countryFlag"`
+    Season      int        `json:"season"`
+    Standings   []Standing `json:"standings"`
+    LastUpdated string     `json:"lastUpdated"`
+}
+

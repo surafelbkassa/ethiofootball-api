@@ -36,10 +36,16 @@ func main() {
 	eventRepo := repository.NewEventRepository()
 	newsUC := usecase.NewNewsUseCase(eventRepo)
 
+	// Standings setup
+	standingsRepo := repository.NewStandingsRepo(redisClient)
+	standingsUC := usecase.NewStandingsUsecase(standingsRepo)
+	standingsHandler := controller.NewStandingsController(standingsUC)
+
 	// Router
 	router := routers.NewRouter(fixtureUC, newsUC)
 	routers.RegisterTeamRoutes(router, teamHandler)
 	routers.RegisterAPISercice(router, historyHandler)
+	routers.RegisterStandingsRoutes(router, standingsHandler)
 
 	router.Run()
 }
