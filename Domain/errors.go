@@ -1,9 +1,10 @@
 package domain
 
-import (
-	"errors"
-)
+import "errors"
 
 var (
-	ErrUnexpected = errors.New("Unexpected")
+	ErrInternalServer = errors.New("internal server error")
+	ErrDuplicateFound = errors.New("duplicate key found")
+	ErrTeamNotFound   = errors.New("team not found")
+	ErrUnexpected     = errors.New("Unexpected")
 )
