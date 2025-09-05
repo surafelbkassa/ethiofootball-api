@@ -62,20 +62,19 @@ type APIResponse struct {
 }
 
 type Match struct {
-	Fixture PFixture `json:"fixture"`
-	League  League   `json:"league"`
-	Teams   Teams    `json:"teams"`
-	Goals   Goals    `json:"goals"`
-	Score   Score    `json:"score"`
+	Fixture PFixture     `json:"fixture"`
+	League  League       `json:"league"`
+	Teams   Teams        `json:"teams"`
+	Goals   Goals        `json:"goals"`
+	Score   Score        `json:"score"`
 }
 
 type PFixture struct {
-	ID        int     `json:"id"`
-	Referee   *string `json:"referee"`
-	Timezone  string  `json:"timezone"`
-	Date      string  `json:"date"`
-	Timestamp int64   `json:"timestamp"`
-	Venue     Venue   `json:"venue"`
+	ID        int    `json:"id"`
+	Date      string `json:"date"`
+	Timestamp int64  `json:"timestamp"`
+	Venue     Venue  `json:"venue"`
+	Status  Status 		 `json:"status"`
 }
 
 type Venue struct {
@@ -111,6 +110,31 @@ type Score struct {
 	Penalty   Goals `json:"penalty"`
 }
 
+
+type EventTeam struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Logo string `json:"logo"`
+}
+
+type EventPlayer struct {
+	ID   *int    `json:"id"`
+	Name *string `json:"name"`
+}
+
+type EventAssist struct {
+	ID   *int    `json:"id"`
+	Name *string `json:"name"`
+}
+
+type Status struct {
+	Long 	string 	`json:"long"`
+	Short	string 	`json:"short"`
+	Elapsed int 	`json:"elapsed`
+	Extra   int 	`json:"extra"`
+
+}
+
 type PrevFixtures struct {
 	FixtureID   int    `json:"fixture_id"`
 	Date        string `json:"date"`
@@ -121,6 +145,7 @@ type PrevFixtures struct {
 	AwayTeam    MTeam  `json:"away_team"`
 	Goals       Goals  `json:"goals"`
 	Score       Score  `json:"score"`
+	Status  	Status `json:"status"`
 }
 
 type RoundQuery struct {
