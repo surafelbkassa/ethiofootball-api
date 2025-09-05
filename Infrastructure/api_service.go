@@ -148,7 +148,6 @@ func (ac *APIServiceClient) LiveFixtures(league string) (*[]domain.PrevFixtures,
 	
 	for _, r := range apiResponse.Response {
 
-
 		fixture := domain.PrevFixtures{
 			Date:        r.Fixture.Date,
 			Venue:       r.Fixture.Venue.Name,
@@ -185,5 +184,7 @@ func (ac *APIServiceClient) LiveFixtures(league string) (*[]domain.PrevFixtures,
 	return prevFixtures, nil
 
 }
+
+
 
 

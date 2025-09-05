@@ -67,3 +67,10 @@ func RegisterAPISercice(r *gin.Engine, handler *controlller.FixturesController) 
 	}
 
 }
+
+func RegisterStandingsRoutes(r *gin.Engine, handler *controlller.StandingsController) {
+	standings := r.Group("api/standings")
+	{
+		standings.GET("", handler.GetStandings)
+	}
+}
