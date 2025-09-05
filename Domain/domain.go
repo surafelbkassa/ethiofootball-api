@@ -2,12 +2,13 @@ package domain
 
 // Team represents a football team
 type Team struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Short    string `json:"short"`
-	League   string `json:"league"`
-	CrestURL string `json:"crest_url"`
-	Bio      string `json:"bio"`
+	ID       string    `json:"id"`
+	Name     string    `json:"name"`
+	Short    string    `json:"short"`
+	League   string    `json:"league"`
+	CrestURL string    `json:"crest_url"`
+	Bio      string    `json:"bio"`
+	Fixtures []Fixture // Add this line
 }
 
 // Standing represents league table information
@@ -22,14 +23,17 @@ type Standing struct {
 }
 
 // Fixture represents a scheduled or completed match
+
 type Fixture struct {
 	ID          string `json:"id"`
 	League      string `json:"league"`
-	DateUTC     string `json:"date_utc"`
+	DateUTC     string `json:"date_utc"` // ISO string
 	HomeID      string `json:"home_id"`
 	AwayID      string `json:"away_id"`
 	Status      string `json:"status"`
 	Score       string `json:"score"`
+	HomeLogo    string `json:"home_logo,omitempty"`
+	AwayLogo    string `json:"away_logo,omitempty"`
 	LastUpdated string `json:"last_updated"`
 }
 
