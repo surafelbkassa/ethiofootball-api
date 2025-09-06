@@ -21,6 +21,7 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 	router.GET("/fixtures", func(c *gin.Context) {
 		league := c.Query("league")
 		team := c.Query("team")
+		season := c.Query("season")
 		from := c.Query("from")
 		to := c.Query("to")
 
@@ -28,6 +29,7 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 			c.Request.Context(), // Pass context
 			league,
 			team,
+			season,
 			from,
 			to,
 		)

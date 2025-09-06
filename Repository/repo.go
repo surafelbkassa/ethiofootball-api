@@ -71,7 +71,7 @@ func (tr *teamRepo) Add(ctx context.Context, team *domain.Team) error {
 
 // FixtureRepo abstracts fixture fetching
 type FixtureRepo interface {
-	GetFixtures(league, team, from, to string) ([]domain.Fixture, error)
+	GetFixtures(league, team, season, from, to string) ([]domain.Fixture, error)
 }
 
 // APIRepo fetches fixtures from API and caches in Redis
@@ -84,16 +84,16 @@ func NewAPIRepo(rdb *redis.Client) *APIRepo {
 	return &APIRepo{RDB: rdb}
 }
 
-func cacheKey(league, team, from, to string) string {
-	return fmt.Sprintf("fixtures:%s:%s:%s:%s", league, team, from, to)
+func cacheKey(league, team, season, from, to string) string {
+	return fmt.Sprintf("fixtures:%s:%s:%s:%s:%s", league, team, season, from, to)
 }
 
-func (r *APIRepo) GetFixtures(league, team, from, to string) ([]domain.Fixture, error) {
+func (r *APIRepo) GetFixtures(league, team, season, from, to string) ([]domain.Fixture, error) {
 	ctx := context.Background()
 
 	// Try cache first
 	if r.RDB != nil {
-		if raw, err := r.RDB.Get(ctx, cacheKey(league, team, from, to)).Result(); err == nil {
+		if raw, err := r.RDB.Get(ctx, cacheKey(league, team, season, from, to)).Result(); err == nil {
 			var cached []domain.Fixture
 			if err := json.Unmarshal([]byte(raw), &cached); err == nil {
 				return cached, nil
@@ -103,7 +103,7 @@ func (r *APIRepo) GetFixtures(league, team, from, to string) ([]domain.Fixture, 
 	}
 
 	// Fetch from API
-	raw, err := infrastructure.FetchFixturesFromAPI(league, team, from, to)
+	raw, err := infrastructure.FetchFixturesFromAPI(league, team, season, from, to)
 	if err != nil {
 		fmt.Printf("FetchFixturesFromAPI failed: league=%s team=%s from=%s to=%s err=%v\n", league, team, from, to, err)
 		return nil, err
@@ -129,7 +129,7 @@ func (r *APIRepo) GetFixtures(league, team, from, to string) ([]domain.Fixture, 
 	// Cache result for 5 minutes (best-effort)
 	if r.RDB != nil {
 		if b, err := json.Marshal(fixtures); err == nil {
-			_ = r.RDB.Set(ctx, cacheKey(league, team, from, to), b, 5*time.Minute).Err()
+			_ = r.RDB.Set(ctx, cacheKey(league, team, season, from, to), b, 5*time.Minute).Err()
 		}
 	}
 
@@ -137,7 +137,7 @@ func (r *APIRepo) GetFixtures(league, team, from, to string) ([]domain.Fixture, 
 }
 
 // SetFixturesCache manually writes fixtures to cache (optional)
-func (r *APIRepo) SetFixturesCache(league, team, from, to string, fixtures []domain.Fixture) error {
+func (r *APIRepo) SetFixturesCache(league, team, season, from, to string, fixtures []domain.Fixture) error {
 	if r.RDB == nil {
 		return nil
 	}
@@ -147,5 +147,5 @@ func (r *APIRepo) SetFixturesCache(league, team, from, to string, fixtures []dom
 	if err != nil {
 		return err
 	}
-	return r.RDB.Set(ctx, cacheKey(league, team, from, to), data, 5*time.Minute).Err()
+	return r.RDB.Set(ctx, cacheKey(league, team, season, from, to), data, 5*time.Minute).Err()
 }
