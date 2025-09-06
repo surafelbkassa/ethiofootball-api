@@ -2,9 +2,11 @@ package routers
 
 import (
 	"net/http"
+	"os"
 
-	controlller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
+	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
 	domain "github.com/abrshodin/ethio-fb-backend/Domain"
+	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -46,7 +48,7 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 	})
 
 	// News route
-	newsHandler := controlller.NewNewsController(newsUC)
+	newsHandler := controller.NewNewsController(newsUC)
 	newsRouter := router.Group("/news")
 
 	newsRouter.GET("/pastMatches", newsHandler.GetNews)
@@ -56,7 +58,20 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 	return router
 }
 
-func RegisterTeamRoutes(r *gin.Engine, handler *controlller.TeamController) {
+func RegisterRoute(router *gin.Engine) {
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	intentParser := infrastructure.NewAIIntentParser(apiKey)
+	intentUsecase := usecase.NewParseIntentUsecase(intentParser)
+	intentController := controller.NewIntentController(intentUsecase)
+	answerComposer := infrastructure.NewAIAnswerComposer(apiKey)
+	answerUseCase := usecase.NewAnswerUseCase(answerComposer)
+	answerController := controller.NewAnswerController(answerUseCase)
+
+	router.POST("/intent/parse", intentController.ParseIntent)
+	router.POST("/answer", answerController.HandlePostAnswer)
+}
+
+func RegisterTeamRoutes(r *gin.Engine, handler *controller.TeamController) {
 	team := r.Group("team")
 	{
 		team.GET("/:id/bio", handler.GetTeam)
@@ -64,11 +79,19 @@ func RegisterTeamRoutes(r *gin.Engine, handler *controlller.TeamController) {
 	}
 }
 
-func RegisterAPISercice(r *gin.Engine, handler *controlller.PrevFixturesController) {
+func RegisterAPISercice(r *gin.Engine, handler *controller.FixturesController) {
 
 	api := r.Group("api")
 	{
 		api.GET("/previous-fixtures", handler.PreviousMatchHistory)
+		api.GET("/live", handler.LiveFixtures)
 	}
 
+}
+
+func RegisterStandingsRoutes(r *gin.Engine, handler *controller.StandingsController) {
+	standings := r.Group("api/standings")
+	{
+		standings.GET("", handler.GetStandings)
+	}
 }

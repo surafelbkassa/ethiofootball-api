@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
+	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
 	routers "github.com/abrshodin/ethio-fb-backend/Delivery/Router"
 	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
@@ -26,8 +26,8 @@ func main() {
 
 	apiService := infrastructure.NewAPIService()
 	prevRepo := repository.NewPrevFixturesRepo(redisClient)
-	prevUC := usecase.NewPrevFixturesUsecase(apiService, prevRepo)
-	historyHandler := controller.NewPrevFixturesController(prevUC)
+	prevUC := usecase.NewFixturesUsecase(apiService, prevRepo)
+	historyHandler := controller.NewFixturesController(prevUC)
 
 	fixtureRepo := repository.NewAPIRepo(redisClient)
 	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo, fixtureRepo)
@@ -36,10 +36,17 @@ func main() {
 	eventRepo := repository.NewEventRepository()
 	newsUC := usecase.NewNewsUseCase(eventRepo)
 
+	// Standings setup
+	standingsRepo := repository.NewStandingsRepo(redisClient)
+	standingsUC := usecase.NewStandingsUsecase(standingsRepo)
+	standingsHandler := controller.NewStandingsController(standingsUC)
+
 	// Router
 	router := routers.NewRouter(fixtureUC, newsUC)
 	routers.RegisterTeamRoutes(router, teamHandler)
 	routers.RegisterAPISercice(router, historyHandler)
+	routers.RegisterStandingsRoutes(router, standingsHandler)
+	routers.RegisterRoute(router)
 
 	router.Run()
 }

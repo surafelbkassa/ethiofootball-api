@@ -11,7 +11,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// NewTeamRepo creates a new team repository
 func NewTeamRepo(rdb *redis.Client) domain.IRedisRepo {
 	return &teamRepo{rdb: rdb}
 }
@@ -21,7 +20,8 @@ type teamRepo struct {
 }
 
 func (tr *teamRepo) Get(ctx context.Context, teamId string) (*domain.Team, error) {
-	key := "team:" + teamId
+
+	key := "team" + teamId
 	vals, err := tr.rdb.HGetAll(ctx, key).Result()
 	if err != nil {
 		return nil, domain.ErrInternalServer
@@ -54,7 +54,7 @@ func (tr *teamRepo) Add(ctx context.Context, team *domain.Team) error {
 	}
 
 	err = tr.rdb.HSet(ctx, key, map[string]interface{}{
-		"id":        team.ID,
+		"ID":        team.ID,
 		"name":      team.Name,
 		"short":     team.Short,
 		"league":    team.League,
