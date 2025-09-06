@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	controlller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
+	domain "github.com/abrshodin/ethio-fb-backend/Domain"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -34,10 +35,13 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 			to,
 		)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			// Log error server-side and continue returning empty fixtures
+			c.JSON(http.StatusOK, gin.H{"fixtures": []domain.Fixture{}})
 			return
 		}
-
+		if fixtures == nil {
+			fixtures = []domain.Fixture{}
+		}
 		c.JSON(http.StatusOK, gin.H{"fixtures": fixtures})
 	})
 

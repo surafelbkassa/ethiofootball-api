@@ -81,13 +81,16 @@ func (uc *fixtureUsecase) GetFixtures(ctx context.Context, league, team, season,
 	if league == "" {
 		return nil, errors.New("league is required")
 	}
+
+	// Call repo once and use its result
 	fixtures, err := uc.repo.GetFixtures(league, team, season, from, to)
 	if err != nil {
+		// propagate error (repo may return non-nil err on auth/network issues)
 		return nil, err
 	}
+	// always return empty slice instead of nil to avoid JSON "null"
 	if fixtures == nil {
-		fixtures = []domain.Fixture{}
+		return []domain.Fixture{}, nil
 	}
-	// Just call the repo — caching is handled inside APIRepo
-	return uc.repo.GetFixtures(league, team, season, from, to)
+	return fixtures, nil
 }

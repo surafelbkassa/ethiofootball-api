@@ -105,8 +105,10 @@ func (r *APIRepo) GetFixtures(league, team, season, from, to string) ([]domain.F
 	// Fetch from API
 	raw, err := infrastructure.FetchFixturesFromAPI(league, team, season, from, to)
 	if err != nil {
-		fmt.Printf("FetchFixturesFromAPI failed: league=%s team=%s from=%s to=%s err=%v\n", league, team, from, to, err)
-		return nil, err
+		// Log for debugging; but return an empty slice to the client (avoid "fixtures": null)
+		fmt.Printf("FetchFixturesFromAPI failed: league=%s team=%s season=%s from=%s to=%s err=%v\n", league, team, season, from, to, err)
+		// Ensure we return an empty slice (not nil) so JSON is [] in response
+		return []domain.Fixture{}, nil
 	}
 
 	var fixtures []domain.Fixture
