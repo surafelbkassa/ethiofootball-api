@@ -1,12 +1,12 @@
 package routers
 
 import (
-	"os"
 	"net/http"
+	"os"
 
 	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
+	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
-	"github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +18,7 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 			"message": "pong",
 		})
 	})
+
 
 	// Fixtures route
 	router.GET("/fixtures", func(c *gin.Context) {
@@ -53,13 +54,16 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 }
 
 func RegisterRoute(router *gin.Engine) {
-	
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	intentParser := infrastructure.NewAIIntentParser(apiKey)
 	intentUsecase := usecase.NewParseIntentUsecase(intentParser)
 	intentController := controller.NewIntentController(intentUsecase)
+	answerComposer := infrastructure.NewAIAnswerComposer(apiKey)
+	answerUseCase := usecase.NewAnswerUseCase(answerComposer)
+	answerController := controller.NewAnswerController(answerUseCase)
 
 	router.POST("/intent/parse", intentController.ParseIntent)
+	router.POST("/answer", answerController.HandlePostAnswer)
 }
 
 func RegisterTeamRoutes(r *gin.Engine, handler *controller.TeamController) {
