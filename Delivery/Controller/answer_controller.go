@@ -20,6 +20,7 @@ func NewAnswerController(auc usecase.AnswerUsecase) *AnswerController {
 }
 
 type postAnswerRequest struct {
+	Topic       string                 `json:"topic"`
 	Language    string                 `json:"language"`
 	Source      string                 `json:"source"`
 	Freshness   time.Time              `json:"freshness"`
@@ -34,6 +35,7 @@ func (c *AnswerController) HandlePostAnswer(ctx *gin.Context) {
 	}
 
 	answerContext := domain.AnswerContext{
+		Topic:       req.Topic,
 		Language:    req.Language,
 		Source:      req.Source,
 		Freshness:   req.Freshness,
