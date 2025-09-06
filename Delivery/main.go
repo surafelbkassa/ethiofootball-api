@@ -29,8 +29,8 @@ func main() {
 	prevUC := usecase.NewPrevFixturesUsecase(apiService, prevRepo)
 	historyHandler := controller.NewPrevFixturesController(prevUC)
 
-	fixtureRepo := &repository.APIRepo{}
-	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo)
+	fixtureRepo := repository.NewAPIRepo(redisClient)
+	fixtureUC := usecase.NewFixtureUsecase(fixtureRepo, fixtureRepo)
 
 	// News setup
 	eventRepo := repository.NewEventRepository()
