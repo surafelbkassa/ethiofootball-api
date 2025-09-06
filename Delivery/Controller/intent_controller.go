@@ -29,7 +29,6 @@ func (h *IntentController) ParseIntent(c *gin.Context) {
 
 	intent, err := h.parseIntent.Execute(req.Text)
 	if err != nil {
-		// map semantic errors to HTTP codes
 		switch {
 		case errors.Is(err, usecase.ErrInvalidInput):
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -40,5 +39,6 @@ func (h *IntentController) ParseIntent(c *gin.Context) {
 		return
 	}
 
+	
 	c.JSON(http.StatusOK, intent)
 }
