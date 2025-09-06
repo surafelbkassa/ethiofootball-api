@@ -51,7 +51,7 @@ func RedisConnect() *redis.Client {
 //	from,to: optional dates in YYYY-MM-DD
 //
 // Returns error if API key missing or upstream error.
-func FetchFixturesFromAPI(league, team, from, to string) ([]map[string]string, error) {
+func FetchFixturesFromAPI(league, team, season, from, to string) ([]map[string]string, error) {
 	apiKey := os.Getenv("API_FOOTBALL_KEY")
 	if apiKey == "" {
 		return nil, fmt.Errorf("missing API_FOOTBALL_KEY in .env")
@@ -81,6 +81,10 @@ func FetchFixturesFromAPI(league, team, from, to string) ([]map[string]string, e
 	if to != "" {
 		params.Set("to", to)
 	}
+	if season != "" {
+		params.Set("season", season)
+	}
+
 	if team != "" {
 		// allow numeric team id only
 		if _, err := strconv.Atoi(team); err == nil {
