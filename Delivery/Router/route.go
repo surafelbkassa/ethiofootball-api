@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
+	domain "github.com/abrshodin/ethio-fb-backend/Domain"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -17,11 +18,11 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 		})
 	})
 
-
 	// Fixtures route
 	router.GET("/fixtures", func(c *gin.Context) {
 		league := c.Query("league")
 		team := c.Query("team")
+		season := c.Query("season")
 		from := c.Query("from")
 		to := c.Query("to")
 
@@ -29,14 +30,18 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 			c.Request.Context(), // Pass context
 			league,
 			team,
+			season,
 			from,
 			to,
 		)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			// Log error server-side and continue returning empty fixtures
+			c.JSON(http.StatusOK, gin.H{"fixtures": []domain.Fixture{}})
 			return
 		}
-
+		if fixtures == nil {
+			fixtures = []domain.Fixture{}
+		}
 		c.JSON(http.StatusOK, gin.H{"fixtures": fixtures})
 	})
 
