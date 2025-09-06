@@ -1,10 +1,12 @@
 package routers
 
 import (
+	"os"
 	"net/http"
 
-	controlller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
+	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
+	"github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,7 +42,7 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 	})
 
 	// News route
-	newsHandler := controlller.NewNewsController(newsUC)
+	newsHandler := controller.NewNewsController(newsUC)
 	newsRouter := router.Group("/news")
 
 	newsRouter.GET("/pastMatches", newsHandler.GetNews)
@@ -50,7 +52,17 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 	return router
 }
 
-func RegisterTeamRoutes(r *gin.Engine, handler *controlller.TeamController) {
+func RegisterRoute(router *gin.Engine) {
+	
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	intentParser := infrastructure.NewAIIntentParser(apiKey)
+	intentUsecase := usecase.NewParseIntentUsecase(intentParser)
+	intentController := controller.NewIntentController(intentUsecase)
+
+	router.POST("/intent/parse", intentController.ParseIntent)
+}
+
+func RegisterTeamRoutes(r *gin.Engine, handler *controller.TeamController) {
 	team := r.Group("team")
 	{
 		team.GET("/:id/bio", handler.GetTeam)
@@ -58,7 +70,7 @@ func RegisterTeamRoutes(r *gin.Engine, handler *controlller.TeamController) {
 	}
 }
 
-func RegisterAPISercice(r *gin.Engine, handler *controlller.FixturesController) {
+func RegisterAPISercice(r *gin.Engine, handler *controller.FixturesController) {
 
 	api := r.Group("api")
 	{
@@ -68,7 +80,7 @@ func RegisterAPISercice(r *gin.Engine, handler *controlller.FixturesController) 
 
 }
 
-func RegisterStandingsRoutes(r *gin.Engine, handler *controlller.StandingsController) {
+func RegisterStandingsRoutes(r *gin.Engine, handler *controller.StandingsController) {
 	standings := r.Group("api/standings")
 	{
 		standings.GET("", handler.GetStandings)
