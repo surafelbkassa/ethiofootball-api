@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-
-	"github.com/abrshodin/ethio-fb-backend/Domain"
-
+	
+	domain "github.com/abrshodin/ethio-fb-backend/Domain"
 	"google.golang.org/genai"
+	
 )
 
 type AIIntentParser struct {

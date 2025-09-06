@@ -75,3 +75,8 @@ func (uc *fixtureUsecase) GetFixtures(ctx context.Context, league, team, from, t
 	}
 	return fixtures, nil
 }
+
+
+type AnswerUsecase interface {
+	Compose(ctx context.Context, context domain.AnswerContext) (*domain.Answer, error)
+}
