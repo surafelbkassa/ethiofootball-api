@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	domain "github.com/abrshodin/ethio-fb-backend/Domain"
-	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
 )
 
@@ -17,12 +16,12 @@ type IFixturesUsecase interface {
 	 GetLiveMatches (league string)(*[]domain.PrevFixtures, error)
 }
 
-func NewFixturesUsecase(api infrastructure.IAPIService, repo repository.IFixturesRepo) IFixturesUsecase {
+func NewFixturesUsecase(api domain.IAPIService, repo repository.IFixturesRepo) IFixturesUsecase {
 	return &FixturesUsecase{api: api, repo: repo}
 }
 
 type FixturesUsecase struct {
-	api  infrastructure.IAPIService
+	api  domain.IAPIService
 	repo repository.IFixturesRepo
 }
 

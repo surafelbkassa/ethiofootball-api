@@ -2,10 +2,8 @@ package routers
 
 import (
 	"net/http"
-	"os"
 
 	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
-	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -42,28 +40,25 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 		c.JSON(http.StatusOK, gin.H{"fixtures": fixtures})
 	})
 
-	// News route
-	newsHandler := controller.NewNewsController(newsUC)
+	
+	
+	return router
+}
+
+func RegisterNewsRoutes(router *gin.Engine, newsHandler *controller.NewsController){
+
 	newsRouter := router.Group("/news")
 
 	newsRouter.GET("/pastMatches", newsHandler.GetNews)
 	newsRouter.GET("/standings", newsHandler.GetStandingNews)
 	newsRouter.GET("/futureMatches", newsHandler.GetFutureNews)
 	newsRouter.GET("/liveScores", newsHandler.GetLiveScores)
-	return router
 }
 
-func RegisterRoute(router *gin.Engine) {
-	apiKey := os.Getenv("GEMINI_API_KEY")
-	intentParser := infrastructure.NewAIIntentParser(apiKey)
-	intentUsecase := usecase.NewParseIntentUsecase(intentParser)
-	intentController := controller.NewIntentController(intentUsecase)
-	answerComposer := infrastructure.NewAIAnswerComposer(apiKey)
-	answerUseCase := usecase.NewAnswerUseCase(answerComposer)
-	answerController := controller.NewAnswerController(answerUseCase)
+func RegisterRoute(router *gin.Engine, handler *controller.IntentController, answerHandler *controller.AnswerController) {
 
-	router.POST("/intent/parse", intentController.ParseIntent)
-	router.POST("/answer", answerController.HandlePostAnswer)
+	router.POST("/intent/parse", handler.ParseIntent)
+	router.POST("/answer", answerHandler.HandlePostAnswer)
 }
 
 func RegisterTeamRoutes(r *gin.Engine, handler *controller.TeamController) {

@@ -10,12 +10,8 @@ import (
 	domain "github.com/abrshodin/ethio-fb-backend/Domain"
 )
 
-type IAPIService interface {
-	PrevFixtures(leagueID int, season int, fromDate, toDate string) (*[]domain.PrevFixtures, error)
-	LiveFixtures(league string) (*[]domain.PrevFixtures, error)
-}
 
-func NewAPIService() IAPIService {
+func NewAPIService() domain.IAPIService {
 	return &APIServiceClient{}
 }
 
@@ -185,6 +181,59 @@ func (ac *APIServiceClient) LiveFixtures(league string) (*[]domain.PrevFixtures,
 
 }
 
+func (ac *APIServiceClient) Statistics(league, season, team int) (*domain.TeamComparison, error){
+
+	API_KEY := os.Getenv("API_SPORTS_API_KEY")
+
+	url := fmt.Sprintf("https://v3.football.api-sports.io/teams/statistics?league=%d&season=%d&team=%d", league, season, team)
+
+	client := &http.Client{}
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		return nil, domain.ErrInternalServer
+	}
+
+	// API headers
+	req.Header.Set("x-rapidapi-key", API_KEY)
+	req.Header.Set("x-rapidapi-host", "v3.football.api-sports.io")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error making request:", err)
+		return nil, domain.ErrInternalServer
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		return nil, domain.ErrInternalServer
+	}
+
+	var apiResponse domain.StatAPIResponse
+	if err := json.Unmarshal(body, &apiResponse); err != nil {
+		return nil, domain.ErrInternalServer
+	}
 
 
+	// Ensure response is not empty
+	if apiResponse.Response.Team.Name == "" {
+		return nil, nil
+	}
+
+	teamData := &domain.TeamComparison{
+		Name: apiResponse.Response.Team.Name,
+		MatchesPlayed: apiResponse.Response.Fixture.Played.Total,
+		Wins: apiResponse.Response.Fixture.Wins.Total,
+		Draws: apiResponse.Response.Fixture.Draws.Total,
+		Losses: apiResponse.Response.Fixture.Lose.Total,
+		GoalsFor: apiResponse.Response.Goals.For.Total.Total,
+		GoalsAgainst: apiResponse.Response.Goals.Against.Total.Total,
+	}
+
+
+return teamData, nil
+}
 

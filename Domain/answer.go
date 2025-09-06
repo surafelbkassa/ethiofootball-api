@@ -10,9 +10,19 @@ type ComparisonTeam struct {
 	FanbaseNotes   string   `json:"fanbase_notes"`
 }
 
+type TeamComparison struct {
+	Name string `json:"name"` 
+	MatchesPlayed int `json:"matches_played"` 
+	Wins int `json:"wins"` 
+	Draws int `json:"draws"` 
+	Losses int `json:"losses"`
+	GoalsFor int `json:"goals_for"`
+	GoalsAgainst int `json:"goals_against"` 
+}
+
 type ComparisonData struct {
-	TeamA ComparisonTeam `json:"team_a"`
-	TeamB ComparisonTeam `json:"team_b"`
+	TeamA *TeamComparison `json:"team_a"`
+	TeamB *TeamComparison `json:"team_b"`
 }
 
 type Answer struct {

@@ -44,6 +44,7 @@ func (ip AIIntentParser) Parse(text string) (*domain.Intent, error) {
 				"league":    {Type: genai.TypeString},
 				"date":      {Type: genai.TypeString},
 				"follow_up": {Type: genai.TypeString},
+				"language" : {Type: genai.TypeString},
 			},
 			Required: []string{"topic", "teams", "league"},
 		},
@@ -58,7 +59,8 @@ func (ip AIIntentParser) Parse(text string) (*domain.Intent, error) {
 			about football.Default assumption: unless a specific league is mentioned, provide 
 			information for Ethiopian Premier League (ETH) and English Premier League (EPL) in 
 			the specified order. Response Order: Step 1: Provide data for the Ethiopian Premier 
-			League (ETH). Step 2: Provide data for the English Premier League (EPL). Keep the 
+			League (ETH). Step 2: Provide data for the English Premier League (EPL). Returns only 
+			shorts for premier league 'ETH' for Ethiopian 'EPL' for English Keep the 
 			order consistent: ETH first, EPL second. Language Handling: If the user writes in 
 			Amharic or explicitly wants to interact in Amharic, all responses, including headings 
 			and match details, should be in Amharic. Include a field in the response 'language': 

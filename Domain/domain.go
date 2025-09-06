@@ -60,6 +60,7 @@ type Match struct {
 	Teams   Teams    `json:"teams"`
 	Goals   Goals    `json:"goals"`
 	Score   Score    `json:"score"`
+	
 }
 
 type PFixture struct {
@@ -68,6 +69,11 @@ type PFixture struct {
 	Timestamp int64  `json:"timestamp"`
 	Venue     Venue  `json:"venue"`
 	Status    Status `json:"status"`
+	Played 	  TeamStats `json:"played"`
+	Wins 	  TeamStats `json:"wins"`
+	Lose	  TeamStats	`json:"loses"`
+	Draws 	  TeamStats	`json:"draws"`
+
 }
 
 type Venue struct {
@@ -251,4 +257,33 @@ type StandingsResponse struct {
     Standings   []Standing `json:"standings"`
     LastUpdated string     `json:"lastUpdated"`
 }
+
+type StatAPIResponse struct {
+	Response  Stats `json:"response"`
+}
+
+type Stats struct {
+	League League 	`json:"league"`
+	Team   MTeam	`json:"team"`
+	Fixture PFixture `json:"fixture"`
+	Goals   GoalStat    `json:"goals"`
+}
+
+type TeamStats struct {
+	Home 	int `json:"home"`
+	Away 	int `json:"away"`
+	Total 	int `json:"total"`
+}
+
+type GoalStat struct {
+	For Total `json:"for"`
+	Against Total `json:"against"`
+}
+
+type Total struct{
+	Total TeamStats `json:"total"`
+}
+
+
+
 

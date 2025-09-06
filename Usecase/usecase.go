@@ -12,22 +12,32 @@ import (
 type TeamUsecases interface {
 	GetTeam(ctx context.Context, teamId string) (*domain.Team, error)
 	AddTeam(ctx context.Context, team *domain.Team) error
+	Statistics(ctx context.Context, league, season int, team string) (*domain.TeamComparison, error)
 }
 
-func NewTeamUsecase(repo domain.IRedisRepo) TeamUsecases {
-	return &teamUsecase{teamRepo: repo}
+func NewTeamUsecase(repo domain.IRedisRepo, api domain.IAPIService) TeamUsecases {
+	return &TeamUsecase{teamRepo: repo, api: api}
 }
 
-type teamUsecase struct {
+type TeamUsecase struct {
 	teamRepo domain.IRedisRepo
+	api domain.IAPIService
 }
 
-func (tu *teamUsecase) GetTeam(ctx context.Context, teamId string) (*domain.Team, error) {
+func (tu *TeamUsecase) GetTeam(ctx context.Context, teamId string) (*domain.Team, error) {
 	return tu.teamRepo.Get(ctx, teamId)
 }
 
-func (tu *teamUsecase) AddTeam(ctx context.Context, team *domain.Team) error {
+func (tu *TeamUsecase) AddTeam(ctx context.Context, team *domain.Team) error {
 	return tu.teamRepo.Add(ctx, team)
+}
+
+func (tu *TeamUsecase) Statistics(ctx context.Context, league, season int, team string) (*domain.TeamComparison, error){
+	teamID := 1001
+	if team == "EthiopianCoffee" {
+		teamID = 1004
+	} 
+	return tu.api.Statistics(league, season, teamID)
 }
 
 type FixtureUsecase interface {

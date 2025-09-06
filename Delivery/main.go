@@ -9,6 +9,7 @@ import (
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
 	usecase "github.com/abrshodin/ethio-fb-backend/Usecase"
 	"github.com/joho/godotenv"
+	"os"
 )
 
 func main() {
@@ -21,12 +22,13 @@ func main() {
 	// Redis & Team setup
 	redisClient := infrastructure.RedisConnect()
 	teamRepo := repository.NewTeamRepo(redisClient)
-	teamUsecase := usecase.NewTeamUsecase(teamRepo)
-	teamHandler := controller.NewTeamController(teamUsecase)
-
+	
 	apiService := infrastructure.NewAPIService()
 	prevRepo := repository.NewPrevFixturesRepo(redisClient)
 	prevUC := usecase.NewFixturesUsecase(apiService, prevRepo)
+
+	teamUsecase := usecase.NewTeamUsecase(teamRepo, apiService)
+	teamHandler := controller.NewTeamController(teamUsecase)
 	historyHandler := controller.NewFixturesController(prevUC)
 
 	fixtureRepo := repository.NewAPIRepo(redisClient)
@@ -41,12 +43,31 @@ func main() {
 	standingsUC := usecase.NewStandingsUsecase(standingsRepo)
 	standingsHandler := controller.NewStandingsController(standingsUC)
 
+	// News route
+	newsHandler := controller.NewNewsController(newsUC)
+	
+	apiKey := os.Getenv("GEMINI_API_KEY")
+	answerComposer := infrastructure.NewAIAnswerComposer(apiKey)
+	answerUseCase := usecase.NewAnswerUseCase(answerComposer)
+	answerController := controller.NewAnswerController(answerUseCase)
+
+	intentParser := infrastructure.NewAIIntentParser(apiKey)
+	intentUsecase := usecase.NewParseIntentUsecase(intentParser)
+	intentController := controller.NewIntentController(
+														intentUsecase,
+														standingsHandler,
+														newsHandler,
+														teamHandler,
+														answerController,
+													)
+	
 	// Router
 	router := routers.NewRouter(fixtureUC, newsUC)
 	routers.RegisterTeamRoutes(router, teamHandler)
 	routers.RegisterAPISercice(router, historyHandler)
 	routers.RegisterStandingsRoutes(router, standingsHandler)
-	routers.RegisterRoute(router)
+	routers.RegisterNewsRoutes(router, newsHandler)
+	routers.RegisterRoute(router, intentController, answerController)
 
 	router.Run()
 }

@@ -14,3 +14,9 @@ type IStandingsRepo interface {
 	SaveStandings(ctx context.Context, leagueID, season int, standings *StandingsResponse) error
 	GetStandingsFromCache(ctx context.Context, leagueID, season int) (*StandingsResponse, error)
 }
+
+type IAPIService interface {
+	PrevFixtures(leagueID int, season int, fromDate, toDate string) (*[]PrevFixtures, error)
+	LiveFixtures(league string) (*[]PrevFixtures, error)
+	Statistics(league, season, team int) (*TeamComparison, error)
+}
