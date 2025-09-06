@@ -91,3 +91,8 @@ func (uc *fixtureUsecase) GetFixtures(ctx context.Context, league, team, season,
 	// Just call the repo — caching is handled inside APIRepo
 	return uc.repo.GetFixtures(league, team, season, from, to)
 }
+
+
+type AnswerUsecase interface {
+	Compose(ctx context.Context, context domain.AnswerContext) (*domain.Answer, error)
+}

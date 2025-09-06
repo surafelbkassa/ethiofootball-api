@@ -30,8 +30,12 @@ func RedisConnect() *redis.Client {
 	})
 
 	// smoke-set (non-fatal)
-	_ = rdb.Set(ctx, "ethiofb:ping", "pong", 10*time.Second).Err()
+	err := rdb.Set(ctx, "ethiofb:ping", "pong", 10*time.Second).Err()
 
+	if err != nil {
+		panic(err)
+	}
+	
 	return rdb
 }
 
