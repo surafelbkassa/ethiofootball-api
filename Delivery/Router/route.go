@@ -24,7 +24,13 @@ func NewRouter(fixtureUC usecase.FixtureUsecase, newsUC *usecase.NewsUseCase) *g
 		from := c.Query("from")
 		to := c.Query("to")
 
-		fixtures, err := fixtureUC.GetFixtures(league, team, from, to)
+		fixtures, err := fixtureUC.GetFixtures(
+			c.Request.Context(), // Pass context
+			league,
+			team,
+			from,
+			to,
+		)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
