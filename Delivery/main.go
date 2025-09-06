@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controllers"
+	controller "github.com/abrshodin/ethio-fb-backend/Delivery/Controller"
 	routers "github.com/abrshodin/ethio-fb-backend/Delivery/Router"
 	infrastructure "github.com/abrshodin/ethio-fb-backend/Infrastructure"
 	repository "github.com/abrshodin/ethio-fb-backend/Repository"
@@ -46,6 +46,7 @@ func main() {
 	routers.RegisterTeamRoutes(router, teamHandler)
 	routers.RegisterAPISercice(router, historyHandler)
 	routers.RegisterStandingsRoutes(router, standingsHandler)
+	routers.RegisterRoute(router)
 
 	router.Run()
 }
